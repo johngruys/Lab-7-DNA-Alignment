@@ -1,3 +1,5 @@
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -95,7 +97,52 @@ public class SequenceAligner {
      * operations have the same max score.
      */
     private void fillCache() {
-        // delete this line and add your code
+        // Fill first result (i,j = 0)
+        cache[0][0] = new Result(0, Direction.NONE);
+
+        // Fill first row in cache with results
+        for (int j = 1; j != (m + 1); ++j) {
+            cache[0][j] = new Result((j * judge.getGapCost()), Direction.LEFT);
+        }
+
+        // Fill first column in cache with results
+        for (int i = 1; i != (n + 1); ++i) {
+            cache[i][0] = new Result((i * judge.getGapCost()), Direction.UP);
+        }
+
+        // Iterate through remaining squares
+
+        // i changes row number
+        for (int i = 1; i != (n+1); ++i) {
+            // j changes column number
+            for (int j = 1; j != (m + 1); ++j) {
+                // Int to store best result so far (M I or D) and a var to store direction
+                int best;
+                Direction parent;
+
+                // Calculate cases
+                int M = this.judge.score(x.charAt(i - 1), y.charAt(j - 1)) + (cache[i-1][j-1]).getScore();
+                int I = (cache[i][j-1]).getScore() + judge.getGapCost();
+                int D = (cache[i-1][j]).getScore() + judge.getGapCost();
+
+                // Compare cases, update values
+                best = M;
+                parent = Direction.DIAGONAL;
+
+                if (I > best) {
+                    best = I;
+                    parent = Direction.LEFT;
+                }
+                if (D > best) {
+                    best = D;
+                    parent = Direction.UP;
+                }
+
+                // Assign a result to (i, j)
+                cache[i][j] = new Result(best, parent);
+            }
+        }
+
     }
 
     /**
@@ -104,7 +151,7 @@ public class SequenceAligner {
      * find the result in O(1) time by looking in your cache.
      */
     public Result getResult(int i, int j) {
-        return null;  // delete this line and add your code
+        return cache[i][j];
     }
 
     /**
@@ -119,7 +166,65 @@ public class SequenceAligner {
      * and m is the length of y.
      */
     private void traceback() {
-        // delete this line and add your code
+        // String builders for aligned strings
+        StringBuilder sbX = new StringBuilder();
+        StringBuilder sbY = new StringBuilder();
+
+        // Keep track of indexes for navigation
+        int i = n;
+        int j = m;
+
+        // Start at bottom right corner
+        Result curr = cache[i][j];
+
+
+        while (curr.getParent() != Direction.NONE) {
+            // Mark that it is on the path
+            curr.markPath();
+            // Get parent
+            Direction par = curr.getParent();
+
+            // Handle cases based on parent, M (diag) -> [x+y add char], I (left) -> [y add char, x add _], D (up) -> [x add char, y add _]
+            if (par == Direction.LEFT) {
+                // Add chars to strings
+                sbY.append(y.charAt(j-1));
+                sbX.append(Constants.GAP_CHAR);
+
+                // New curr is result to left, update indexes and curr
+                j = j - 1;
+                curr = cache[i][j];
+
+            } else if (par == Direction.UP) {
+                // Add chars to string
+                sbY.append(Constants.GAP_CHAR);
+                sbX.append(x.charAt(i-1));
+
+                // New curr is result above, update indexes and curr
+                i = i - 1;
+                curr = cache[i][j];
+
+            } else if (par == Direction.DIAGONAL) {
+                // Add chars
+                sbY.append(y.charAt(j-1));
+                sbX.append(x.charAt(i-1));
+
+                // New curr diagonal, update
+                i = i - 1;
+                j = j - 1;
+                curr = cache[i][j];
+            }
+        }
+
+        // Reverse
+        sbX.reverse();
+        sbY.reverse();
+
+        // Convert SB's to strings
+        alignedX = sbX.toString();
+        alignedY = sbY.toString();
+
+        // Mark (0, 0) as on path
+        (cache[0][0]).markPath();
     }
 
     /**

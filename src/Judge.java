@@ -57,7 +57,13 @@ public class Judge {
    * Returns the score associated with the two characters.
    */
   public int score(char a, char b) {
-    return 0;  // delete this line and add your code
+    if (a == '_' || b == '_') {
+      return gapCost;
+    } else if (a == b) {
+      return matchCost;
+    } else {
+      return mismatchCost;
+    }
   }
   
   /**
@@ -66,6 +72,13 @@ public class Judge {
    * Returns the score associated with the two strings.
    */
   public int score(String s1, String s2) {
-    return 0;  // delete this line and add your code
+    if (s2.length() != s1.length()) {
+      throw new IllegalArgumentException("Strings can't be different lengths...");
+    }
+    int total = 0;
+    for (int i = 0; i < s1.length(); i++) {
+      total += score(s1.charAt(i), s2.charAt(i));
+    }
+    return total;
   }
 }

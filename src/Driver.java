@@ -31,8 +31,8 @@ public class Driver {
   public static void main(String... args) {
     System.out.println(Constants.TITLE);
     System.out.println("Start the GUI...");
-    SequenceAligner pair = new SequenceAligner(6);
-    // SequenceAligner pair = new SequenceAligner("ACACCC", "GCCTCGA");  // example in instructions
+//    SequenceAligner pair = new SequenceAligner(6);
+     SequenceAligner pair = new SequenceAligner("ACACCC", "GCCTCGA");  // example in instructions
     System.out.println(pair);
     SwingUtilities.invokeLater(() -> new GUI(pair));
   } 

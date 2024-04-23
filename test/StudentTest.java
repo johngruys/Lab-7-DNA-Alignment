@@ -14,8 +14,114 @@ public class StudentTest {
     customJudgeTest();
     empties();
     singletons();
-    // your tests go here
+
+    smallTest();
+    emptyTest();
+    stringLengthTest();
+    markerTest();
+    randomTest();
   }
+
+  // My tests
+
+  @Test
+  public void emptyTest() {
+    SequenceAligner sa;
+    Result result;
+    sa = new SequenceAligner("", "");
+    result = sa.getResult(0, 0);
+    assertNotNull(result);
+    assertEquals(0, result.getScore());
+  }
+
+  @Test
+  public void smallTest() {
+    SequenceAligner sa = new SequenceAligner("ACACCC", "GCCTCGA");
+    Result result = sa.getResult(6, 7);
+    assertNotNull(result);
+    assertEquals(-1, result.getScore());
+    assertEquals(Direction.DIAGONAL, result.getParent());
+
+    Result result2 = sa.getResult(6, 6);
+    assertNotNull(result2);
+    assertEquals(0, result2.getScore());
+
+    Result result3 = sa.getResult(5, 4);
+    assertNotNull(result3);
+    assertEquals(-1, result3.getScore());
+  }
+
+  @Test
+  public void stringLengthTest() {
+    SequenceAligner sa = new SequenceAligner("ACACCC", "GCCTCGA");
+    String x = sa.getAlignedX();
+    String y = sa.getAlignedY();
+    assertEquals(x.length(), y.length());
+  }
+
+  @Test
+  public void markerTest() {
+    SequenceAligner sa = new SequenceAligner("ACACCC", "GCCTCGA");
+
+    Result result = sa.getResult(6, 7);
+    assertNotNull(result);
+    assertTrue(result.onPath());
+
+    result = sa.getResult(5, 6);
+    assertNotNull(result);
+    assertTrue(result.onPath());
+
+    result = sa.getResult(5, 5);
+    assertNotNull(result);
+    assertTrue(result.onPath());
+
+    result = sa.getResult(4, 4);
+    assertNotNull(result);
+    assertTrue(result.onPath());
+
+    result = sa.getResult(4, 3);
+    assertNotNull(result);
+    assertTrue(result.onPath());
+
+    result = sa.getResult(3, 2);
+    assertNotNull(result);
+    assertTrue(result.onPath());
+
+    result = sa.getResult(2, 2);
+    assertNotNull(result);
+    assertTrue(result.onPath());
+
+    result = sa.getResult(1, 1);
+    assertNotNull(result);
+    assertTrue(result.onPath());
+  }
+
+
+  @Test
+  public void randomTest() {
+    SequenceAligner sa = new SequenceAligner(10);
+
+    // Check string length
+    assertTrue(sa.isAligned());
+    int lenX = sa.getX().length();
+    int lenY = sa.getY().length();
+
+
+    Result result = sa.getResult(lenX, lenY);
+    assertTrue(result.onPath());
+
+    result = sa.getResult(0,0);
+    assertTrue(result.onPath());
+    assertEquals(0, result.getScore());
+    assertEquals(Direction.NONE, result.getParent());
+
+  }
+
+
+
+
+
+  // Default Tests
 
   @Test
   public void defaultJudgeTest() {
